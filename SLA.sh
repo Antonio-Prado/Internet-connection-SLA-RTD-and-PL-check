@@ -1,9 +1,10 @@
 #!/bin/bash
-#####################################################
-# Simple bash script @SBTAP-AS59715                 #
-# S L A   C H E C K                                 #
-# ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]  #
-#####################################################
+##########################################################################################################
+# Simple bash script @SBTAP-AS59715                                                                      #
+# S L A   C H E C K                                                                                      #
+# ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]       #
+# Example: sudo ./SLA.sh 1000 90 0.03                                                                    #
+##########################################################################################################
 if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
       then
       echo "You must be root, use sudo." 
