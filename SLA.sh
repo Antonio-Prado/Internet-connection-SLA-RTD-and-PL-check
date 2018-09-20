@@ -2,7 +2,7 @@
 #####################################################
 # Simple bash script @SBTAP-AS59715                 #
 # S L A   C H E C K                                 #
-# ./SLA.sh [amount of ICMP packets to send]         #
+# ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]  #
 #####################################################
 if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
       then
@@ -14,11 +14,15 @@ fi
 ANCHOR_HOSTS_v4=( "193.201.40.210" "217.29.76.27" )
 ANCHOR_HOSTS_v6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" )
 
-if [[ $# -eq 0 ]] ; then
-    echo 'Usage: ./SLA.sh [amount of ICMP packets to send recommended 10000]'
-    exit 1
+if ! [ $# -ge 3 ]
+then
+  echo "Usage: ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]"
+  echo "Example: sudo ./SLA.sh 1000 90 0.03"
+  exit 1
 else
 PING_PACKETS=$1
+RTD=$2
+PL=$3
 fi
 #here we go
 
@@ -45,7 +49,7 @@ done
 let RTD_v4_AVG="${RTD_v4_SUM} / ${#ANCHOR_HOSTS_v4[@]}"
 
 #verify if we met the v4 SLA
-if [[ ( "$RTD_v4_AVG" -gt 100 ) || ( "$PL_v4_SUM" > 0.02 ) ]]
+if [[ ( "$RTD_v4_AVG" -gt "$RTD" ) || ( "$PL_v4_SUM" > "$PL" ) ]]
 then
         echo "==========> v4 SLA KO <=========="
 else
@@ -92,7 +96,7 @@ let RTD_v6_AVG="${RTD_v6_SUM} / ${#ANCHOR_HOSTS_v6[@]}"
 
 
 #verify if we met the v6 SLA
-if [[ ( "$RTD_v6_AVG" -gt 100 ) || ( "$PL_v6_SUM" > 0.02 ) ]]
+if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]
 then
         echo "==========> v6 SLA KO <=========="
 else
