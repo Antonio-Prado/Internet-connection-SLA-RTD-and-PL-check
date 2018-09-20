@@ -1,8 +1,5 @@
 #!/bin/bash
 #####################################################
-# LICENSE CC-BY-NC-SA                               #
-# http://creativecommons.org/licenses/by-nc-sa/4.0/ #
-#####################################################
 # Simple bash script @SBTAP-AS59715                 #
 # S L A   C H E C K                                 #
 # ./SLA.sh [amount of ICMP packets to send]         #
