@@ -14,3 +14,8 @@ PL < 0.02%
 Usage: ./SLA.sh [amount of ICMP packets to send recommended 10000]
 
 Example: sudo ./SLA.sh 10000
+
+For an extensive and more accurate test the recommended amount of packets is 10k, but please, be patient: probes can last more than one hour.
+Out of 10k packets it is expected a maximum of 2 lost packets and an average round trip delay value less than 100ms.
+
+Of course you can tune the threshold values by adjusting the script yourself.
