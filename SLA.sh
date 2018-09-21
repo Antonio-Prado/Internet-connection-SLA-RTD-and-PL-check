@@ -21,6 +21,9 @@ if ! [ $# -ge 3 ]
 then
   echo "Usage: ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]"
   echo "Example: sudo ./SLA.sh 1000 90 0.03"
+  echo "It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the"
+  echo "SLA assuming that the average RTD should be less than 100ms and that maximum PL should be 0.03%."
+  echo "Recommended values are 10000 100 0.02"
   exit 1
 else
 PING_PACKETS=$1
