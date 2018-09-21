@@ -24,3 +24,5 @@ Recommended values are 10000 100 0.02
 Out of 10k packets it is expected a maximum of 2 lost packets and an average round trip delay value less than 100ms.
 
 Of course you can tune the threshold values by adjusting the script arguments.
+
+To get reliable results, run this script on a box behind the gateway with no other load.
