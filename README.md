@@ -5,7 +5,7 @@ Run as root in order to use some ping advanced options.
 
 This code sends ICMP and ICMPv6 packets to RIPE anchors placed in Italy at MIX (Milan Internet Exchange point) and at Namex (Rome Internet Exchange point).
 
-It measures Round trip delay and Packet Loss values in order to meet some SLA policies, for example, as coded in this script:
+It measures Round trip delay and Packet Loss values in order to meet some SLA policies, for example, as we recommend:
 
 RTD < 100ms
 
