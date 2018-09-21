@@ -54,7 +54,7 @@ done
 #do the math
 let RTD_v4_AVG="${RTD_v4_SUM} / ${#ANCHOR_HOSTS_v4[@]}"
 
-#verify if we met the v4 SLA
+#verify if we meet our v4 SLA
 if [[ ( "$RTD_v4_AVG" -gt "$RTD" ) || ( "$PL_v4_SUM" > "$PL" ) ]]
 then
         echo "==========> v4 SLA KO <=========="
@@ -101,7 +101,7 @@ done
 let RTD_v6_AVG="${RTD_v6_SUM} / ${#ANCHOR_HOSTS_v6[@]}"
 
 
-#verify if we met the v6 SLA
+#verify if we meet our v6 SLA
 if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]
 then
         echo "==========> v6 SLA KO <=========="
