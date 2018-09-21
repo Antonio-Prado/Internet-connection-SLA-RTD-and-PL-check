@@ -4,7 +4,7 @@
 # S L A   C H E C K                                                                                      #
 # ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]       #
 # Example: sudo ./SLA.sh 1000 90 0.03                                                                    #
-# It means: send 1k ICMP  and ICMPv6 packets to the two defined anchor hosts, do the math and check the  #
+# It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the   #
 # SLA assuming that the average RTD should be less than 100ms and that maximum PL should be 0.03%.       #
 ##########################################################################################################
 if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
