@@ -11,9 +11,11 @@ RTD < 100ms
 
 PL < 0.02%
 
-Usage: ./SLA.sh [amount of ICMP packets to send recommended 10000]
+./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]
 
-Example: sudo ./SLA.sh 10000
+Example: sudo ./SLA.sh 1000 90 0.03
+
+It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the SLA assuming that the average RTD should be less than 100ms and that maximum PL should be 0.03%.      
 
 For an extensive and more accurate test the recommended amount of packets is 10k, but please, be patient: probes can last more than one hour.
 Out of 10k packets it is expected a maximum of 2 lost packets and an average round trip delay value less than 100ms.
