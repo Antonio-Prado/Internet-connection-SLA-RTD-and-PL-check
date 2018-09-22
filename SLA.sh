@@ -63,7 +63,7 @@ do
   PL_v4_VALUE=`cat PING_RESULTS_v4.txt|grep loss|cut -d, -f3|cut -d% -f1`;
         echo "RTD ${RTD_v4_VALUE} on ${i}";
         echo "PL ${PL_v4_VALUE} on ${i}";
-        echo -n > PING_RESULTS_v4.txt;
+        rm -f PING_RESULTS_v4.txt;
 	echo ##################################
         RTD_v4_SUM=$(( ${RTD_v4_SUM} + ${RTD_v4_VALUE} ))
         PL_v4_SUM=$( echo $PL_v4_SUM + $PL_v4_VALUE | bc )
@@ -109,7 +109,7 @@ do
   PL_v6_VALUE=`cat PING_RESULTS_v6.txt|grep loss|cut -d, -f3|cut -d% -f1`;
         echo "RTD ${RTD_v6_VALUE} on ${i}";
         echo "PL ${PL_v6_VALUE} on ${i}";
-        echo -n > PING_RESULTS_v6.txt;
+        rm -f PING_RESULTS_v6.txt;
 	echo ##################################
         RTD_v6_SUM=$(( ${RTD_v6_SUM} + ${RTD_v6_VALUE} ))
         PL_v6_SUM=$( echo $PL_v6_SUM + $PL_v6_VALUE | bc )
