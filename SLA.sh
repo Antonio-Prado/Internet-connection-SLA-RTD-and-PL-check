@@ -7,9 +7,27 @@
 # It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the   #
 # SLA assuming that the average RTD should be less than 100ms and that maximum PL should be 0.03%.       #
 ##########################################################################################################
+#let's check if needed commands are available
+
+if ! [ -x "$(command -v bc)" ]; then
+  echo 'bc is needed to do the math' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v ping)" ]; then
+  echo 'ping is needed to send ICMP' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v ping6)" ]; then
+  echo 'ping6 is needed to send ICMPv6' >&2
+  exit 1
+fi
+
+#be sure that commands are executed as root
 if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
       then
-      echo "You must be root, use sudo." 
+      echo "You must be root, use sudo."
       exit 1
 fi
 
