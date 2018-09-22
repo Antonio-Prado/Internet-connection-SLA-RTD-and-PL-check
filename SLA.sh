@@ -7,6 +7,7 @@
 # It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the   #
 # SLA assuming that the average RTD must be less than 100ms and that maximum PL must be 0.03%.           #
 ##########################################################################################################
+
 #let's check if needed commands are available
 
 if ! [ -x "$(command -v bc)" ]; then
