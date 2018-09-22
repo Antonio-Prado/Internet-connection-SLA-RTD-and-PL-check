@@ -36,6 +36,7 @@ fi
 ANCHOR_HOSTS_v4=( "193.201.40.210" "217.29.76.27" )
 ANCHOR_HOSTS_v6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" )
 
+#check arguments
 if ! [ $# -ge 3 ]
 then
   echo "Usage: ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]"
