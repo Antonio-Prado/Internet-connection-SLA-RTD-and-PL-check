@@ -15,7 +15,7 @@ PL < 0.02%
 
 Example: sudo ./SLA.sh 1000 90 0.03
 
-It implies: send 10 ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the SLA assuming that the average RTD should be less than 100ms and that maximum PL should be 0.03%.      
+It implies sending 1000 ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the SLA assuming that the average RTD must be less than 100ms and that maximum PL must be 0.03%.      
 
 For an extensive and more accurate test the recommended amount of packets is 10k, but please, be patient: probes can last more than one hour.
 
