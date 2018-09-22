@@ -5,7 +5,7 @@
 # ./SLA.sh [amount of ICMP packets to send] [round trip delay threshold value] [packet loss value]       #
 # Example: sudo ./SLA.sh 1000 90 0.03                                                                    #
 # It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the   #
-# SLA assuming that the average RTD must be less than 100ms and that maximum PL must be 0.03%.       #
+# SLA assuming that the average RTD must be less than 100ms and that maximum PL must be 0.03%.           #
 ##########################################################################################################
 #let's check if needed commands are available
 
@@ -50,7 +50,12 @@ PL=$3
 fi
 
 #Let's check if PL value is a correct percentage
-if [[ "$PL" =~ ^[0-9]+$ && "$PING_PACKETS" -ge 1 && "$PING_PACKETS" -le 100 && "$PL" -ge 0 && "$PL" -le 100 ]] || (( "$PING_PACKETS" >= 101 && "$PING_PACKETS" <= 1000 && (( $(echo "$PL >= 0.1" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) ))  || (( "$PING_PACKETS" >= 1001 && "$PING_PACKETS" <= 10000 && (( $(echo "$PL >= 0.01" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) )) || (( "$PING_PACKETS" >= 10001 && "$PING_PACKETS" <= 100000 && (( $(echo "$PL >= 0.001" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) ))
+if
+[[ "$PL" =~ ^[0-9]+$ && "$PING_PACKETS" -ge 1 && "$PING_PACKETS" -le 100 && "$PL" -ge 0 \
+&& "$PL" -le 100 ]] || (( "$PING_PACKETS" >= 101 && "$PING_PACKETS" <= 1000 && (( $(echo "$PL >= 0.1" | bc -l) )) \
+&& (( $(echo "$PL <= 100" | bc -l) )) ))  || (( "$PING_PACKETS" >= 1001 && "$PING_PACKETS" <= 10000 \
+&& (( $(echo "$PL >= 0.01" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) )) || (( "$PING_PACKETS" >= 10001 \
+&& "$PING_PACKETS" <= 100000 && (( $(echo "$PL >= 0.001" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) ))
 
 then
 
