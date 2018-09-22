@@ -84,11 +84,11 @@ fi
 
 echo ##################################
 echo Is there any IPv6 connectivity here?
-echo Trying to reach google.com
+echo Trying to reach RIPE anchor at MIX
 echo ##################################
 ((count = 3))
 while [[ $count -ne 0 ]] ; do
-    ping6 -qc 1 2001:1ac0:0:200:0:a5d1:6004:27
+    ping6 -oqc 1 2001:1ac0:0:200:0:a5d1:6004:27
     rc=$?
     if [[ $rc -eq 0 ]] ; then
         ((count = 1))
