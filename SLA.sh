@@ -48,6 +48,12 @@ PING_PACKETS=$1
 RTD=$2
 PL=$3
 fi
+
+#Let's check if PL value is a correct percentage
+if [[ "$PL" =~ ^[0-9]+$ && "$PING_PACKETS" -ge 1 && "$PING_PACKETS" -le 100 && "$PL" -ge 0 && "$PL" -le 100 ]] || (( "$PING_PACKETS" >= 101 && "$PING_PACKETS" <= 1000 && (( $(echo "$PL >= 0.1" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) ))  || (( "$PING_PACKETS" >= 1001 && "$PING_PACKETS" <= 10000 && (( $(echo "$PL >= 0.01" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) )) || (( "$PING_PACKETS" >= 10001 && "$PING_PACKETS" <= 100000 && (( $(echo "$PL >= 0.001" | bc -l) )) && (( $(echo "$PL <= 100" | bc -l) )) ))
+
+then
+
 #here we go
 
 RTD_v4_SUM=0
@@ -79,9 +85,16 @@ then
 else
         echo "==========> v4 SLA OK <=========="
 fi
+else
+echo "During ping, packets can get lost. Here we count the percentage of the loss."
+echo "So, for ICMP between 1 and 100, PL value must be between 0 and 100"
+echo "For ICMP between 101 and 1000, PL value must be between 0.1 and 100"
+echo "For ICMP between 1001 and 10000, PL value must be between 0.01 and 100"
+echo "For ICMP between 10001 and 100000, PL value must be between 0.001 and 100"
+exit 1
+fi
 
 #is there any IPv6 connectivity?
-
 echo ##################################
 echo Is there any IPv6 connectivity here?
 echo Trying to reach RIPE anchor at MIX
