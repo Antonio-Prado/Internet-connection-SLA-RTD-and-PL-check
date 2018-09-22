@@ -27,7 +27,7 @@ if ! [ -x "$(command -v ping6)" ]; then
 fi
 
 #be sure that commands are executed as root
-if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
+if [ "$(whoami)" != "root" ] && [ "$(id -un)" != "root" ]
       then
       echo "You must be root, use sudo."
       exit 1
@@ -70,17 +70,17 @@ RTD_v6_SUM=0
 PL_v6_SUM=0.00
 echo "Let's start with IPv4 SLA check"
 #v4 probes
-for i in ${ANCHOR_HOSTS_v4[@]}
+for i in "${ANCHOR_HOSTS_v4[@]}"
 do
-  ping -W 200 -i 0.11 -s 56 -c $PING_PACKETS ${i}>>PING_RESULTS_v4.txt;
-  RTD_v4_VALUE=`cat PING_RESULTS_v4.txt|tail -n1|cut -d'/' -f5|cut -d. -f1`;
-  PL_v4_VALUE=`cat PING_RESULTS_v4.txt|grep loss|cut -d, -f3|cut -d% -f1`;
+  ping -W 200 -i 0.11 -s 56 -c "$PING_PACKETS" "${i}">>PING_RESULTS_v4.txt;
+  RTD_v4_VALUE=$(cat PING_RESULTS_v4.txt|tail -n1|cut -d'/' -f5|cut -d. -f1);
+  PL_v4_VALUE=$(cat PING_RESULTS_v4.txt|grep loss|cut -d, -f3|cut -d% -f1);
         echo "RTD ${RTD_v4_VALUE} on ${i}";
         echo "PL ${PL_v4_VALUE} on ${i}";
         rm -f PING_RESULTS_v4.txt;
 	echo ##################################
-        RTD_v4_SUM=$(( ${RTD_v4_SUM} + ${RTD_v4_VALUE} ))
-        PL_v4_SUM=$( echo $PL_v4_SUM + $PL_v4_VALUE | bc )
+        RTD_v4_SUM=$(( RTD_v4_SUM + RTD_v4_VALUE ))
+        PL_v4_SUM=$( echo $PL_v4_SUM + "$PL_v4_VALUE" | bc )
 done
 
 #do the math
@@ -123,17 +123,17 @@ echo "Good, there's IPv6 connectivity available"
 echo "Let's go ahead with IPv6 SLA check"
 echo ##################################
 #v6 probes
-for i in ${ANCHOR_HOSTS_v6[@]}
+for i in "${ANCHOR_HOSTS_v6[@]}"
 do
-  ping6 -i 0.11 -s 56 -c $PING_PACKETS ${i}>>PING_RESULTS_v6.txt;
-  RTD_v6_VALUE=`cat PING_RESULTS_v6.txt|tail -n1|cut -d'/' -f5|cut -d. -f1`;
-  PL_v6_VALUE=`cat PING_RESULTS_v6.txt|grep loss|cut -d, -f3|cut -d% -f1`;
+  ping6 -i 0.11 -s 56 -c "$PING_PACKETS" "${i}">>PING_RESULTS_v6.txt;
+  RTD_v6_VALUE=$(cat PING_RESULTS_v6.txt|tail -n1|cut -d'/' -f5|cut -d. -f1);
+  PL_v6_VALUE=$(cat PING_RESULTS_v6.txt|grep loss|cut -d, -f3|cut -d% -f1);
         echo "RTD ${RTD_v6_VALUE} on ${i}";
         echo "PL ${PL_v6_VALUE} on ${i}";
         rm -f PING_RESULTS_v6.txt;
 	echo ##################################
-        RTD_v6_SUM=$(( ${RTD_v6_SUM} + ${RTD_v6_VALUE} ))
-        PL_v6_SUM=$( echo $PL_v6_SUM + $PL_v6_VALUE | bc )
+        RTD_v6_SUM=$(( RTD_v6_SUM + RTD_v6_VALUE ))
+        PL_v6_SUM=$( echo $PL_v6_SUM + "$PL_v6_VALUE" | bc )
 done
 
 #do the math
