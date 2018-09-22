@@ -73,8 +73,8 @@ echo "Let's start with IPv4 SLA check"
 for i in "${ANCHOR_HOSTS_v4[@]}"
 do
   ping -W 200 -i 0.11 -s 56 -c "$PING_PACKETS" "${i}">>PING_RESULTS_v4.txt;
-  RTD_v4_VALUE=$(cat PING_RESULTS_v4.txt|tail -n1|cut -d'/' -f5|cut -d. -f1);
-  PL_v4_VALUE=$(cat PING_RESULTS_v4.txt|grep loss|cut -d, -f3|cut -d% -f1);
+  RTD_v4_VALUE=$(tail -n1 PING_RESULTS_v4.txt|cut -d'/' -f5|cut -d. -f1);
+  PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1);
         echo "RTD ${RTD_v4_VALUE} on ${i}";
         echo "PL ${PL_v4_VALUE} on ${i}";
         rm -f PING_RESULTS_v4.txt;
@@ -84,7 +84,7 @@ do
 done
 
 #do the math
-let RTD_v4_AVG="${RTD_v4_SUM} / ${#ANCHOR_HOSTS_v4[@]}"
+(( RTD_v4_AVG="${RTD_v4_SUM} / ${#ANCHOR_HOSTS_v4[@]}" ))
 
 #verify if we meet our v4 SLA
 if [[ ( "$RTD_v4_AVG" -gt "$RTD" ) || ( "$PL_v4_SUM" > "$PL" ) ]]
@@ -126,8 +126,8 @@ echo ##################################
 for i in "${ANCHOR_HOSTS_v6[@]}"
 do
   ping6 -i 0.11 -s 56 -c "$PING_PACKETS" "${i}">>PING_RESULTS_v6.txt;
-  RTD_v6_VALUE=$(cat PING_RESULTS_v6.txt|tail -n1|cut -d'/' -f5|cut -d. -f1);
-  PL_v6_VALUE=$(cat PING_RESULTS_v6.txt|grep loss|cut -d, -f3|cut -d% -f1);
+  RTD_v6_VALUE=$(tail -n1 PING_RESULTS_v6.txt|cut -d'/' -f5|cut -d. -f1);
+  PL_v6_VALUE=$(grep loss PING_RESULTS_v6.txt|cut -d, -f3|cut -d% -f1);
         echo "RTD ${RTD_v6_VALUE} on ${i}";
         echo "PL ${PL_v6_VALUE} on ${i}";
         rm -f PING_RESULTS_v6.txt;
@@ -137,7 +137,7 @@ do
 done
 
 #do the math
-let RTD_v6_AVG="${RTD_v6_SUM} / ${#ANCHOR_HOSTS_v6[@]}"
+(( RTD_v6_AVG="${RTD_v6_SUM} / ${#ANCHOR_HOSTS_v6[@]}" ))
 
 
 #verify if we meet our v6 SLA
