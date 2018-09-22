@@ -41,7 +41,7 @@ then
   echo "Example: sudo ./SLA.sh 1000 90 0.03"
   echo "It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts, do the math and check the"
   echo "SLA assuming that the average RTD must be less than 100ms and that maximum PL must be 0.03%."
-  echo "Recommended values are 10000 100 0.02"
+  echo "Recommended values are 10000 100 0.02. But be patient: probe can take more than one hour."
   exit 1
 else
 PING_PACKETS=$1
