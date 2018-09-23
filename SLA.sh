@@ -149,10 +149,10 @@ if [[ $rc -eq 0 ]]; then
   (( RTD_v6_AVG="${RTD_v6_SUM} / ${#AHv6[@]}" ));
 
 # verify if we meet our v6 SLA
-	if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]; then
+  if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]; then
     echo '==========> v6 SLA KO <==========' >&2;
-  else
-  echo '==========> v6 SLA OK <==========' >&2;
+    else
+    echo '==========> v6 SLA OK <==========' >&2;
   fi
   
   else
