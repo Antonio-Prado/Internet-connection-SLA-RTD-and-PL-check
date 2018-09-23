@@ -85,7 +85,7 @@ if
       echo '##################################' >&2;
       RTD_v4_SUM=$(( RTD_v4_SUM + RTD_v4_VALUE ));
       PL_v4_SUM=$( echo $PL_v4_SUM + "$PL_v4_VALUE" | bc );
-		done
+    done
 
 # do the math
   (( RTD_v4_AVG="${RTD_v4_SUM} / ${#AHv4[@]}" ))
@@ -147,7 +147,6 @@ if [[ $rc -eq 0 ]]; then
 
 # do the math
   (( RTD_v6_AVG="${RTD_v6_SUM} / ${#AHv6[@]}" ));
-
 
 # verify if we meet our v6 SLA
 	if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]; then
