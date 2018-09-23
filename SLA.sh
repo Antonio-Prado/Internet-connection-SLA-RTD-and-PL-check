@@ -124,7 +124,7 @@ while [[ $count -ne 0 ]]; do
       ((count = 1))
     fi
 	((count = count - 1))
-	done
+done
 
 if [[ $rc -eq 0 ]]; then
   echo '##################################' >&2;
