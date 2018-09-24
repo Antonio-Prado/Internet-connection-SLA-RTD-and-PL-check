@@ -6,9 +6,8 @@
 # [packet loss value]                                                          #
 # Example: sudo ./SLA.sh 1000 90 0.03                                          #
 # It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts,   #
-# do the math and check the                                                    #
-# SLA assuming that the average RTD must be less than 100ms and that maximum   #
-# PL must be 0.03%.                                                            #
+# do the math and check the SLA assuming that the average RTD must be less     #
+# than 100ms and that maximum PL must be 0.03%.                                #
 # ICMP packets value must be between 1 and 100k.                               #
 ################################################################################
 
