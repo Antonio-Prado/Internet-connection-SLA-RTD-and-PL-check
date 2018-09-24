@@ -42,15 +42,15 @@ AHv6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" );
 
 # check arguments
 if !	[ $# -ge 3 ]; then
-  echo "Usage: ./SLA.sh [amount of ICMP packets to send] [round trip delay \
-  threshold value] [packet loss value]" >&2;
+  echo "Usage: ./SLA.sh [amount of ICMP packets to send] [round trip delay"
+  echo "threshold value] [packet loss value]" >&2;
   echo "Example: sudo ./SLA.sh 1000 90 0.03" >&2;
-  echo "It means: send 1k ICMP and ICMPv6 packets to the two defined anchor \
-  hosts, do the math and check the" >&2;
-  echo "SLA assuming that the average RTD must be less than 100ms and that \
-  maximum PL must be 0.03%." >&2;
-  echo "Recommended values are 10000 100 0.02. But be patient: probe can \
-  take more than one hour." >&2;
+  echo "It means: send 1k ICMP and ICMPv6 packets to the two defined anchor"
+  echo "hosts, do the math and check the" >&2;
+  echo "SLA assuming that the average RTD must be less than 100ms and that"
+  echo "maximum PL must be 0.03%." >&2;
+  echo "Recommended values are 10000 100 0.02. But be patient: probe can"
+  echo "take more than one hour." >&2;
   exit 1;
 else
   PP=$1;
@@ -98,16 +98,14 @@ if
     fi
 	
   else
-    echo "During ping, packets can get lost. Here we count the percentage of \
-    the loss." >&2;
-    echo "So, for ICMP between 1 and 100, PL value must be between 0 and 100" \
-    >&2;
-    echo "For ICMP between 101 and 1000, PL value must be between 0.1 and 100" \
-    >&2;
-    echo "For ICMP between 1001 and 10000, PL value must be between 0.01 and \
-    100" >&2;
-    echo "For ICMP between 10001 and 100000, PL value must be between 0.001 \
-    and 100" >&2;
+    echo "During ping, packets can get lost. Here we count the percentage of"
+    echo "the loss." >&2;
+    echo "So, for ICMP between 1 and 100, PL value must be between 0 and 100"
+    echo "For ICMP between 101 and 1000, PL value must be between 0.1 and 100"
+    echo "For ICMP between 1001 and 10000, PL value must be between 0.01 and"
+    echo "100" >&2;
+    echo "For ICMP between 10001 and 100000, PL value must be between 0.001"
+    echo "and 100" >&2;
     exit 1;
 fi
 
