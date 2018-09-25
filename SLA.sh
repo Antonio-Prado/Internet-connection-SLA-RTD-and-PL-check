@@ -72,29 +72,58 @@ if
   RTD_v6_SUM=0;
   PL_v6_SUM=0.00;
   echo "Let's start with IPv4 SLA check" >&2;
+  AH4=${#AHv4[@]}
+  AH6=${#AHv6[@]}
+
+# is there any IPv4 connectivity?;
+  echo '##################################' >&2;
+  echo 'Is there any IPv4 connectivity here?' >&2;
+  echo 'Trying to reach RIPE anchor at MIX' >&2;
+  echo '##################################' >&2;
+  ((count = 3))
+  while [[ $count -ne 0 ]]; do
+    ping -qc 1 217.29.76.27
+    rc=$?
+      if [[ $rc -eq 0 ]]; then
+        ((count = 1))
+      fi
+    ((count = count - 1))
+  done
+
+  if [[ $rc -eq 0 ]]; then
+    echo '##################################' >&2;
+    echo "Good, there's IPv4 connectivity available" >&2;
+    echo "Let's go ahead with IPv4 SLA check" >&2;
+    echo '##################################' >&2;
 
 # v4 probes
     for i in "${AHv4[@]}"; do
       ping -W 200 -i 0.11 -s 56 -c "$PP" "${i}">>PING_RESULTS_v4.txt;
       RTD_v4_VALUE=$(tail -n1 PING_RESULTS_v4.txt|cut -d'/' -f5|cut -d. -f1);
-      PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1);
+      PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1|cut -d' ' -f2);
       echo "RTD ${RTD_v4_VALUE} on ${i}" >&2;
       echo "PL ${PL_v4_VALUE}% on ${i}" >&2;
       rm -f PING_RESULTS_v4.txt;
       echo '##################################' >&2;
       RTD_v4_SUM=$(( RTD_v4_SUM + RTD_v4_VALUE ));
-      PL_v4_SUM=$( echo $PL_v4_SUM + "$PL_v4_VALUE" | bc );
+      PL_v4_SUM=$(echo $PL_v4_SUM + "$PL_v4_VALUE" | bc );
     done
 
 # do the math
-  (( RTD_v4_AVG="${RTD_v4_SUM} / ${#AHv4[@]}" ))
+    (( RTD_v4_AVG="${RTD_v4_SUM} / $AH4" ))
+    (( PL_v4_AVG=$(echo "scale=0;$PL_v4_SUM / $AH4"|bc -l ) ))
 
 # verify if we meet our v4 SLA
-    if [[ ( "$RTD_v4_AVG" -gt "$RTD" ) || ( "$PL_v4_SUM" > "$PL" ) ]]; then
-      echo '==========> v4 SLA KO <==========' >&2;
+      if (( RTD_v4_AVG > RTD  )) || (( $(echo "$PL_v4_AVG > $PL" |bc -l) )); then
+        echo '==========> v4 SLA KO <==========' >&2;
+      else
+        echo '==========> v4 SLA OK <==========' >&2;
+      fi
     else
-      echo '==========> v4 SLA OK <==========' >&2;
-    fi
+      echo '##################################' >&2;
+      echo 'NO IPv4 connectivity available' >&2;
+      echo '##################################' >&2;
+  fi
 	
   else
     echo "During ping, packets can get lost. Here we count the percentage of"
@@ -144,9 +173,10 @@ if [[ $rc -eq 0 ]]; then
 
 # do the math
   (( RTD_v6_AVG="${RTD_v6_SUM} / ${#AHv6[@]}" ));
+  (( PL_v6_AVG=$(echo "scale=0;$PL_v6_SUM / $AH6"|bc -l ) ))
 
 # verify if we meet our v6 SLA
-  if [[ ( "$RTD_v6_AVG" -gt "$RTD" ) || ( "$PL_v6_SUM" > "$PL" ) ]]; then
+    if (( RTD_v6_AVG > RTD  )) || (( $(echo "$PL_v6_AVG > $PL" |bc -l) )); then
     echo '==========> v6 SLA KO <==========' >&2;
     else
     echo '==========> v6 SLA OK <==========' >&2;
