@@ -79,7 +79,7 @@ if
       RTD_v4_VALUE=$(tail -n1 PING_RESULTS_v4.txt|cut -d'/' -f5|cut -d. -f1);
       PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1);
       echo "RTD ${RTD_v4_VALUE} on ${i}" >&2;
-      echo "PL ${PL_v4_VALUE} on ${i}" >&2;
+      echo "PL ${PL_v4_VALUE}% on ${i}" >&2;
       rm -f PING_RESULTS_v4.txt;
       echo '##################################' >&2;
       RTD_v4_SUM=$(( RTD_v4_SUM + RTD_v4_VALUE ));
@@ -135,7 +135,7 @@ if [[ $rc -eq 0 ]]; then
     RTD_v6_VALUE=$(tail -n1 PING_RESULTS_v6.txt|cut -d'/' -f5|cut -d. -f1);
     PL_v6_VALUE=$(grep loss PING_RESULTS_v6.txt|cut -d, -f3|cut -d% -f1);
     echo "RTD ${RTD_v6_VALUE} on ${i}" >&2;
-    echo "PL ${PL_v6_VALUE} on ${i}" >&2;
+    echo "PL ${PL_v6_VALUE}% on ${i}" >&2;
     rm -f PING_RESULTS_v6.txt;
     echo '##################################' >&2;
     RTD_v6_SUM=$(( RTD_v6_SUM + RTD_v6_VALUE ));
