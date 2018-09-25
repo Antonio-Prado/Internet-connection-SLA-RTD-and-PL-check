@@ -100,7 +100,8 @@ if
     for i in "${AHv4[@]}"; do
       ping -W 200 -i 0.11 -s 56 -c "$PP" "${i}">>PING_RESULTS_v4.txt;
       RTD_v4_VALUE=$(tail -n1 PING_RESULTS_v4.txt|cut -d'/' -f5|cut -d. -f1);
-      PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1|cut -d' ' -f2);
+      PL_v4_VALUE=$(grep loss PING_RESULTS_v4.txt|cut -d, -f3|cut -d% -f1| \
+      cut -d' ' -f2);
       echo "RTD ${RTD_v4_VALUE} on ${i}" >&2;
       echo "PL ${PL_v4_VALUE}% on ${i}" >&2;
       rm -f PING_RESULTS_v4.txt;
@@ -114,7 +115,8 @@ if
     (( PL_v4_AVG=$(echo "scale=0;$PL_v4_SUM / $AH4"|bc -l ) ))
 
 # verify if we meet our v4 SLA
-      if (( RTD_v4_AVG > RTD  )) || (( $(echo "$PL_v4_AVG > $PL" |bc -l) )); then
+      if (( RTD_v4_AVG > RTD  )) || (( $(echo "$PL_v4_AVG > $PL" |bc -l) )); \
+      then
         echo '==========> v4 SLA KO <==========' >&2;
       else
         echo '==========> v4 SLA OK <==========' >&2;
@@ -162,7 +164,8 @@ if [[ $rc -eq 0 ]]; then
   for i in "${AHv6[@]}"; do
     ping6 -i 0.11 -s 56 -c "$PP" "${i}">>PING_RESULTS_v6.txt;
     RTD_v6_VALUE=$(tail -n1 PING_RESULTS_v6.txt|cut -d'/' -f5|cut -d. -f1);
-    PL_v6_VALUE=$(grep loss PING_RESULTS_v6.txt|cut -d, -f3|cut -d% -f1);
+    PL_v6_VALUE=$(grep loss PING_RESULTS_v6.txt|cut -d, -f3|cut -d% -f1 \
+    |cut -d' ' -f2);
     echo "RTD ${RTD_v6_VALUE} on ${i}" >&2;
     echo "PL ${PL_v6_VALUE}% on ${i}" >&2;
     rm -f PING_RESULTS_v6.txt;
