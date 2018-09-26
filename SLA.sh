@@ -112,7 +112,7 @@ if
 
 # do the math
     (( RTD_v4_AVG="${RTD_v4_SUM} / $AH4" ))
-    (( PL_v4_AVG=$(echo "scale=0;$PL_v4_SUM / $AH4"|bc -l ) ))
+    PL_v4_AVG=`echo "scale=2;$PL_v4_SUM/$AH4"|bc -l`
 
 # verify if we meet our v4 SLA
       if (( RTD_v4_AVG > RTD  )) || (( $(echo "$PL_v4_AVG > $PL" |bc -l) )); \
@@ -176,7 +176,7 @@ if [[ $rc -eq 0 ]]; then
 
 # do the math
   (( RTD_v6_AVG="${RTD_v6_SUM} / ${#AHv6[@]}" ));
-  (( PL_v6_AVG=$(echo "scale=0;$PL_v6_SUM / $AH6"|bc -l ) ))
+  PL_v6_AVG=`echo "scale=2;$PL_v6_SUM/$AH6"|bc -l`
 
 # verify if we meet our v6 SLA
     if (( RTD_v6_AVG > RTD  )) || (( $(echo "$PL_v6_AVG > $PL" |bc -l) )); then
