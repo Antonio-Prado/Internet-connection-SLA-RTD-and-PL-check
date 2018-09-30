@@ -7,7 +7,7 @@
 # Example: sudo ./SLA.sh 1000 90 0.03                                          #
 # It means: send 1k ICMP and ICMPv6 packets to the two defined anchor hosts,   #
 # do the math and check the SLA assuming that the average RTD must be less     #
-# than 100ms and that maximum PL must be 0.03%.                                #
+# than 100ms and that the average PL must be equal to or less than 0.03%.      #
 # ICMP packets value must be between 1 and 100k.                               #
 ################################################################################
 
@@ -47,7 +47,7 @@ if !	[ $# -ge 3 ]; then
   echo "It means: send 1k ICMP and ICMPv6 packets to the two defined anchor"
   echo "hosts, do the math and check the" >&2;
   echo "SLA assuming that the average RTD must be less than 100ms and that"
-  echo "maximum PL must be 0.03%." >&2;
+  echo "the average PL must be equal to or less than 0.03%." >&2;
   echo "Recommended values are 10000 100 0.02. But be patient: probe can"
   echo "take more than one hour." >&2;
   exit 1;
