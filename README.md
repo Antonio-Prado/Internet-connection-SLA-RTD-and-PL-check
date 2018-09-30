@@ -22,14 +22,14 @@ Example: sudo ./SLA.sh 1000 90 0.03
 
 It implies sending 1000 ICMP and ICMPv6 packets to the two defined anchor hosts,
 do the math and check the SLA assuming that the average RTD must be less than
-100ms and that maximum PL must be 0.03%.      
+100ms and that average PL must be equal to or less than 0.03%.      
 
 For an extensive and more accurate test the recommended amount of packets is
 10k, but please, be patient: probes can last more than one hour.
 
 Recommended values are 10000 100 0.02
 
-Out of 10k packets it is expected a maximum of 2 lost packets and an average
+Out of 10k packets it is expected an average of 2, or less, lost packets and an average
 round trip delay value less than 100ms.
 
 Of course you can tune the threshold values by adjusting the script arguments.
