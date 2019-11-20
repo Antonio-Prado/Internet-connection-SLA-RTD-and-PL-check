@@ -10,6 +10,9 @@
 # than 100ms and that the average PL must be equal to or less than 0.03%.      #
 # ICMP packets value must be between 1 and 100k.                               #
 ################################################################################
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 # let's check if needed commands are available
 
@@ -117,9 +120,9 @@ if
 # verify if we meet our v4 SLA
       if (( RTD_v4_AVG > RTD  )) || (( $(echo "$PL_v4_AVG > $PL" |bc -l) )); \
       then
-        echo '==========> v4 SLA KO <==========' >&2;
+        echo -e "${RED}==========> v4 SLA KO <==========${NC}" >&2;
       else
-        echo '==========> v4 SLA OK <==========' >&2;
+        echo -e "${GREEN}==========> v4 SLA OK <==========${NC}" >&2;
       fi
     else
       echo '##################################' >&2;
@@ -180,9 +183,9 @@ if [[ $rc -eq 0 ]]; then
 
 # verify if we meet our v6 SLA
     if (( RTD_v6_AVG > RTD  )) || (( $(echo "$PL_v6_AVG > $PL" |bc -l) )); then
-    echo '==========> v6 SLA KO <==========' >&2;
-    else
-    echo '==========> v6 SLA OK <==========' >&2;
+    echo -e "${RED}==========> v6 SLA KO <==========${NC}" >&2;
+    else 
+    echo -e "${GREEN}==========> v6 SLA OK <==========${NC}" >&2;
   fi
   
   else
