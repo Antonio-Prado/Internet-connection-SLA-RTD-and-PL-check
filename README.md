@@ -7,6 +7,7 @@ Run as root in order to use some ping advanced options.
 
 This code sends ICMP and ICMPv6 packets to RIPE anchors placed in Italy at MIX
 (Milan Internet Exchange point) and at Namex (Rome Internet Exchange point).
+It is possibile to edit the suggested hosts or add more hosts.
 
 It measures Round trip delay and Packet Loss values in order to meet some SLA
 policies, for example, as we recommend:
@@ -20,7 +21,7 @@ PL < 0.02%
 
 Example: sudo ./SLA.sh 1000 90 0.03
 
-It implies sending 1000 ICMP and ICMPv6 packets to the two defined anchor hosts,
+It implies sending 1000 ICMP and ICMPv6 packets to the defined hosts,
 do the math and check the SLA assuming that the average RTD must be less than
 90ms and that average PL must be equal to or less than 0.03%.      
 
