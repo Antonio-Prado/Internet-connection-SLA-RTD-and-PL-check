@@ -10,6 +10,15 @@
 # than 90ms and that the average PL must be equal to or less than 0.03%.       #
 # ICMP packets value must be between 1 and 100k.                               #
 ################################################################################
+# list IPs of the anchor hosts: RIPE ANCHOR at MIX (217.29.76.27) and RIPE
+# ANCHOR at NAMEX (193.201.40.210)
+# Feel free to edit or add hosts in the next two lines following the used syntax
+AHv4=( "193.201.40.210" "217.29.76.27" );
+AHv6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" );
+
+################################################################################
+#                 NO NEED TO CHANGE CODE BELOW THIS LINE                       #
+################################################################################
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
@@ -36,11 +45,6 @@ if [ "$(whoami)" != "root" ] && [ "$(id -un)" != "root" ]; then
   echo 'You must be root, use sudo.' >&2;
   exit 1;
 fi
-
-# list IPs of the anchor hosts: RIPE ANCHOR at MIX (217.29.76.27) and RIPE
-# ANCHOR at NAMEX (193.201.40.210)
-AHv4=( "193.201.40.210" "217.29.76.27" );
-AHv6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" );
 
 # check arguments
 if !	[ $# -ge 3 ]; then
