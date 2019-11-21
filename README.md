@@ -11,7 +11,7 @@ This code sends ICMP and ICMPv6 packets to RIPE anchors placed in Italy at MIX
 It measures Round trip delay and Packet Loss values in order to meet some SLA
 policies, for example, as we recommend:
 
-RTD < 100ms
+RTD < 90ms
 
 PL < 0.02%
 
@@ -22,15 +22,15 @@ Example: sudo ./SLA.sh 1000 90 0.03
 
 It implies sending 1000 ICMP and ICMPv6 packets to the two defined anchor hosts,
 do the math and check the SLA assuming that the average RTD must be less than
-100ms and that average PL must be equal to or less than 0.03%.      
+90ms and that average PL must be equal to or less than 0.03%.      
 
 For an extensive and more accurate test the recommended amount of packets is
 10k, but please, be patient: probes can last more than one hour.
 
-Recommended values are 10000 100 0.02
+Recommended values are 10000 90 0.02
 
 Out of 10k packets it is expected an average of 2, or less, lost packets and an average
-round trip delay value less than 100ms.
+round trip delay value less than 90ms.
 
 Of course you can tune the threshold values by adjusting the script arguments.
 
