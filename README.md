@@ -22,7 +22,7 @@ PL < 0.02%
 Example: sudo ./SLA.sh 1000 90 0.03
 
 It implies sending 1000 ICMP and ICMPv6 packets to the defined hosts,
-do the math and check the SLA assuming that the average RTD must be less than
+doing the math and checking the SLA assuming that the average RTD must be less than
 90ms and that average PL must be equal to or less than 0.03%.      
 
 For an extensive and more accurate test the recommended amount of packets is
