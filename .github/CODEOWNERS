@@ -1,0 +1,9 @@
+# CODEOWNERS
+#
+# Replace @your-github-handle (and/or add a team) with the actual maintainers.
+# Code owners can be enforced via branch rules / rulesets in GitHub settings.
+#
+# Example:
+# * @your-org/maintainers
+#
+* @Antonio-Prado
