@@ -338,10 +338,14 @@ v4_rtt_json="null"; v6_rtt_json="null"
 [ -n "${V4_AVG_RTT:-}" ] && v4_rtt_json="$V4_AVG_RTT"
 [ -n "${V6_AVG_RTT:-}" ] && v6_rtt_json="$V6_AVG_RTT"
 
+# Escape double quotes for JSON string values.
+run_id_json=${RUN_ID//\"/\\\"}
+outdir_json=${OUTDIR//\"/\\\"}
+
 cat >"$OUTDIR/summary.json" <<JSON
 {
-  "run_id": "$(echo "$RUN_ID" | sed 's/"/\\"/g')",
-  "outdir": "$(echo "$OUTDIR" | sed 's/"/\\"/g')",
+  "run_id": "$run_id_json",
+  "outdir": "$outdir_json",
   "threshold_rtt_ms": $RTD,
   "threshold_loss_pct": $PL,
   "ipv4": { "status": "$V4_STATUS", "avg_rtt_ms": $v4_rtt_json, "avg_loss_pct": ${V4_AVG_LOSS:-0} },
