@@ -25,9 +25,9 @@ Compared to the original version, the script is now more suitable for SLA verifi
 
 ## Requirements
 
-- Bash
+- Bash 3.2 or newer (the stock macOS `/bin/bash` works)
 - `ping`
-- `awk`, `grep`, `wc`, `tr`
+- `awk`, `grep`, `tr`
 - `python3` is **not required** to run the script (it was only used to apply edits during development)
 
 The script works on common Linux distributions and macOS. On systems without `ping6`, it tries `ping -6`.
@@ -79,16 +79,30 @@ The SLA is evaluated **per target**:
 
 Averages reported in `summary.json` are for convenience; they do not override the per-target decision.
 
+### Exit codes
+
+The exit status reflects the overall verdict, so the script can be used from cron or other automation:
+
+| Exit | Meaning |
+|------|---------|
+| `0`  | every measured address family met the SLA (`overall: OK`) |
+| `1`  | at least one address family failed the SLA (`overall: KO`) |
+| `2`  | inconclusive: no address family could be measured, e.g. no connectivity or ICMP filtered (`overall: INCONCLUSIVE`) |
+| `64` | usage error (missing or invalid arguments, invalid target) |
+| `69` | a required command is missing |
+
+A family that is skipped (no `ping6`, no targets) or has no connectivity does not by itself cause `KO`: if the other family is measured and passes, the result is `OK`. The per-family status is always available in `summary.json` (`overall` and `exit_code` are included there too).
+
 ## Configuration
 
 Targets are defined at the top of `SLA.sh`:
 
 ```bash
-AHv4=( "193.201.40.210" "217.29.76.27" )
-AHv6=( "2001:7f8:10:f00c::210" "2001:1ac0:0:200:0:a5d1:6004:27" )
+AHv4=( "193.201.40.211" "217.29.76.27" )
+AHv6=( "2a0f:80:f::211" "2001:1ac0:0:200:0:a5d1:6004:27" )
 ```
 
-You can edit/add targets as needed.
+You can edit/add targets as needed, or override them at runtime with `SLA_TARGETS_V4` / `SLA_TARGETS_V6` (see below).
 
 ### Environment variables
 
@@ -98,6 +112,7 @@ You can override some runtime parameters without editing the script:
 - `SLA_INTERVAL` — seconds between probes (default: `0.2`, root default: `0.11`)
 - `SLA_SIZE` — ICMP payload size (default: `56`)
 - `SLA_PROGRESS` — set to `0` to disable the progress bar
+- `SLA_TARGETS_V4` / `SLA_TARGETS_V6` — space-separated list of targets for each family; set to an empty string to skip that family entirely (e.g. `SLA_TARGETS_V6=`)
 
 Example:
 
@@ -109,7 +124,7 @@ SLA_OUTDIR=/tmp/sla_run_001 SLA_INTERVAL=0.5 SLA_PROGRESS=0 ./SLA.sh 1000 50 0.0
 
 - Some networks and remote hosts may **deprioritize or filter ICMP**. If ICMP is filtered, results may be inconclusive even if user traffic works.
 - The tool measures **RTT to the chosen neutral targets**, not end-to-end application performance.
-- If IPv6 is not available, the IPv6 section is reported as **INCONCLUSIVE** (unless your SLA explicitly requires IPv6, in which case treat it as KO at the process/policy level).
+- If IPv6 is not available, the IPv6 section is reported as **INCONCLUSIVE** (unless your SLA explicitly requires IPv6, in which case treat it as KO at the process/policy level, e.g. by checking `ipv6.status` in `summary.json`).
 
 ## License
 

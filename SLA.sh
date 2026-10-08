@@ -15,15 +15,31 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-# Neutral targets (edit as needed)
+# Exit codes
+#   0  all performed checks met the SLA
+#   1  at least one address family failed the SLA (KO)
+#   2  inconclusive: no address family could be measured
+#  64  usage / invalid arguments
+#  69  required command missing
+EX_OK=0; EX_KO=1; EX_INCONCLUSIVE=2; EX_USAGE=64; EX_UNAVAILABLE=69
+
+# Neutral targets (edit as needed, or override via SLA_TARGETS_V4 / SLA_TARGETS_V6,
+# space-separated). Set a family to an empty string to skip it.
 AHv4=( "193.201.40.211" "217.29.76.27" )
 AHv6=( "2a0f:80:f::211" "2001:1ac0:0:200:0:a5d1:6004:27" )
+if [ -n "${SLA_TARGETS_V4+x}" ]; then read -r -a AHv4 <<<"$SLA_TARGETS_V4"; fi
+if [ -n "${SLA_TARGETS_V6+x}" ]; then read -r -a AHv6 <<<"$SLA_TARGETS_V6"; fi
 
 need_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "$1 is needed." >&2
-    exit 1
+    exit "$EX_UNAVAILABLE"
   fi
+}
+
+# Targets must look like an IP address or hostname (never an option).
+is_target() {
+  [[ "$1" =~ ^[A-Za-z0-9:][A-Za-z0-9.:_-]*$ ]]
 }
 
 is_number() {
@@ -123,7 +139,6 @@ need_cmd date
 need_cmd uname
 need_cmd hostname
 need_cmd grep
-need_cmd wc
 need_cmd tr
 
 # ping6 may be missing: fall back to "ping -6" when available
@@ -134,9 +149,15 @@ elif ping -6 -c 1 ::1 >/dev/null 2>&1; then
   PING6_CMD=( ping -6 )
 fi
 
+# Only iputils ping (Linux) supports -V; BSD/macOS ping has no version flag.
+PING_VERSION="$(ping -V 2>/dev/null | head -n1 || true)"
+[ -z "$PING_VERSION" ] && PING_VERSION="n/a (non-iputils ping, e.g. BSD/macOS)"
+
 # Use -W only when ping is iputils (Linux). On macOS/BSD -W semantics differ.
+# Note: empty arrays are expanded as ${arr[@]+"${arr[@]}"} to stay compatible
+# with bash 3.2 (macOS), where "${arr[@]}" on an empty array trips set -u.
 PING4_W=()
-if ping -V 2>/dev/null | grep -qi iputils; then
+if printf '%s' "$PING_VERSION" | grep -qi iputils; then
   PING4_W=( -W 2 )
 fi
 
@@ -150,7 +171,7 @@ PKT_SIZE="${SLA_SIZE:-56}"
 if [ $# -lt 3 ]; then
   echo "Usage: ./SLA.sh <icmp_packets> <rtt_threshold_ms> <loss_threshold_pct>" >&2
   echo "Example: ./SLA.sh 1000 50 0.02" >&2
-  exit 1
+  exit "$EX_USAGE"
 fi
 
 PP="$1"
@@ -159,16 +180,22 @@ PL="$3"
 
 if ! [[ "$PP" =~ ^[0-9]+$ ]] || [ "$PP" -lt 1 ] || [ "$PP" -gt 100000 ]; then
   echo "icmp_packets must be an integer between 1 and 100000." >&2
-  exit 1
+  exit "$EX_USAGE"
 fi
 if ! is_number "$RTD"; then
   echo "rtt_threshold_ms must be a number (e.g., 50 or 50.5)." >&2
-  exit 1
+  exit "$EX_USAGE"
 fi
 if ! is_number "$PL" || ! fle "$PL" 100; then
   echo "loss_threshold_pct must be a number between 0 and 100 (e.g., 0.02)." >&2
-  exit 1
+  exit "$EX_USAGE"
 fi
+for t in ${AHv4[@]+"${AHv4[@]}"} ${AHv6[@]+"${AHv6[@]}"}; do
+  if ! is_target "$t"; then
+    echo "Invalid target: '$t' (expected an IP address or hostname)." >&2
+    exit "$EX_USAGE"
+  fi
+done
 
 # Bundle output
 RUN_ID="$(date +%Y-%m-%dT%H-%M-%S%z)"
@@ -178,18 +205,19 @@ mkdir -p "$OUTDIR"
 # Metadata (ticket-friendly)
 {
   echo "tool=SLA.sh"
-  echo "tool_version=isp-bash-v1"
+  echo "tool_version=isp-bash-v1.1"
   echo "run_id=$RUN_ID"
   echo "host=$(hostname 2>/dev/null || echo unknown)"
   echo "os=$(uname -a)"
-  echo "ping_version=$(ping -V 2>&1 | head -n1 || true)"
+  echo "bash_version=${BASH_VERSION:-unknown}"
+  echo "ping_version=$PING_VERSION"
   echo "icmp_packets=$PP"
   echo "interval_s=$INTERVAL"
   echo "packet_size_bytes=$PKT_SIZE"
   echo "threshold_rtt_ms=$RTD"
   echo "threshold_loss_pct=$PL"
-  echo "targets_v4=${AHv4[*]}"
-  echo "targets_v6=${AHv6[*]}"
+  echo "targets_v4=${AHv4[*]+"${AHv4[*]}"}"
+  echo "targets_v6=${AHv6[*]+"${AHv6[*]}"}"
 } >"$OUTDIR/meta.txt"
 
 run_probes() {
@@ -210,28 +238,30 @@ run_probes() {
   local show_progress="${SLA_PROGRESS:-1}"   # 1=on (default), 0=off
   local wopts=()
   if [ "$family" = "v4" ]; then
-    wopts=( "${PING4_W[@]}" )
+    wopts=( ${PING4_W[@]+"${PING4_W[@]}"} )
   fi
   if [ "$n_targets" -eq 0 ]; then
     echo "No targets configured for $family." >&2
-    echo "" # status line
+    echo "NO_TARGETS||" # status||avg_rtt||avg_loss
     return 0
   fi
 
-  # Connectivity pre-check (best-effort)
+  # Connectivity pre-check (best-effort): any target answering is enough.
   echo '##################################' >&2
   echo "Is there any ${family} connectivity here?" >&2
-  echo "Trying to reach ${targets[0]}" >&2
+  echo "Trying to reach ${targets[*]}" >&2
   echo '##################################' >&2
 
   local ok=1
-  local tries=3
-  while [ $tries -gt 0 ]; do
-    if LC_ALL=C "${cmd[@]}" -n -q -c 1 "${targets[0]}" >/dev/null 2>&1; then
-      ok=0
-      break
-    fi
-    tries=$((tries-1))
+  local attempt t
+  for attempt in 1 2; do
+    for t in "${targets[@]}"; do
+      if LC_ALL=C "${cmd[@]}" -n -q -c 1 "$t" >/dev/null 2>&1; then
+        ok=0
+        break 2
+      fi
+    done
+    [ "$attempt" -eq 1 ] && sleep 1
   done
 
   if [ $ok -ne 0 ]; then
@@ -262,7 +292,7 @@ run_probes() {
     local est pid
     est="$(awk -v pp="$PP" -v i="$INTERVAL" 'BEGIN{e=pp*i; if(e<1)e=1; printf "%d", int(e+0.999)}')"
 
-    LC_ALL=C "${cmd[@]}" -n -q "${wopts[@]}" -i "$INTERVAL" -s "$PKT_SIZE" -c "$PP" "$t" >"$log" 2>&1 &
+    LC_ALL=C "${cmd[@]}" -n -q ${wopts[@]+"${wopts[@]}"} -i "$INTERVAL" -s "$PKT_SIZE" -c "$PP" "$t" >"$log" 2>&1 &
     pid=$!
 
     if [ "$show_progress" != "0" ]; then
@@ -306,7 +336,7 @@ run_probes() {
 # IPv4
 echo "Results directory: $OUTDIR" >&2
 echo "Let's start with IPv4 SLA check" >&2
-V4_LINE="$(run_probes "v4" ping -- "${AHv4[@]}")"
+V4_LINE="$(run_probes "v4" ping -- ${AHv4[@]+"${AHv4[@]}"})"
 V4_STATUS="${V4_LINE%%||*}"
 V4_REST="${V4_LINE#*||}"
 V4_AVG_RTT="${V4_REST%%||*}"
@@ -330,7 +360,7 @@ if [ "${#PING6_CMD[@]}" -eq 0 ]; then
   V6_AVG_LOSS=""
 else
   echo "Let's start with IPv6 SLA check" >&2
-  V6_LINE="$(run_probes "v6" "${PING6_CMD[@]}" -- "${AHv6[@]}")"
+  V6_LINE="$(run_probes "v6" "${PING6_CMD[@]}" -- ${AHv6[@]+"${AHv6[@]}"})"
   V6_STATUS="${V6_LINE%%||*}"
   V6_REST="${V6_LINE#*||}"
   V6_AVG_RTT="${V6_REST%%||*}"
@@ -343,6 +373,16 @@ else
   else
     echo "==========> v6 SLA INCONCLUSIVE (${V6_STATUS}) <==========" >&2
   fi
+fi
+
+# Overall verdict and exit code:
+# KO if any measured family failed; OK if at least one family was measured
+# and none failed; INCONCLUSIVE if nothing could be measured.
+OVERALL="INCONCLUSIVE"; EXIT_CODE="$EX_INCONCLUSIVE"
+if [ "$V4_STATUS" = "KO" ] || [ "$V6_STATUS" = "KO" ]; then
+  OVERALL="KO"; EXIT_CODE="$EX_KO"
+elif [ "$V4_STATUS" = "OK" ] || [ "$V6_STATUS" = "OK" ]; then
+  OVERALL="OK"; EXIT_CODE="$EX_OK"
 fi
 
 # Write a minimal JSON summary (ticket ingestion)
@@ -361,9 +401,12 @@ cat >"$OUTDIR/summary.json" <<JSON
   "outdir": "$outdir_json",
   "threshold_rtt_ms": $RTD,
   "threshold_loss_pct": $PL,
+  "overall": "$OVERALL",
+  "exit_code": $EXIT_CODE,
   "ipv4": { "status": "$V4_STATUS", "avg_rtt_ms": $v4_rtt_json, "avg_loss_pct": ${V4_AVG_LOSS:-0} },
   "ipv6": { "status": "$V6_STATUS", "avg_rtt_ms": $v6_rtt_json, "avg_loss_pct": ${V6_AVG_LOSS:-0} }
 }
 JSON
 
-exit 0
+echo "==========> overall: ${OVERALL} (exit ${EXIT_CODE}) <==========" >&2
+exit "$EXIT_CODE"

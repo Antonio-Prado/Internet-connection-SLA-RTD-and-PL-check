@@ -45,3 +45,46 @@ jobs:
         run: |
           shellcheck --version
           shellcheck SLA.sh
+
+      # Actually run the script against loopback so runtime regressions
+      # (e.g. bash 3.2 incompatibilities on macOS) are caught, not just lint.
+      - name: Smoke test (loopback)
+        env:
+          SLA_TARGETS_V4: "127.0.0.1"
+          SLA_TARGETS_V6: "::1"
+          SLA_PROGRESS: "0"
+          SLA_OUTDIR: "smoke_out"
+        run: |
+          bash --version | head -n1
+          bash ./SLA.sh 5 100 50
+          test -s smoke_out/summary.json
+          test -s smoke_out/meta.txt
+          test -s smoke_out/ping_v4_127.0.0.1.log
+          python3 - <<'EOF'
+          import json
+          d = json.load(open("smoke_out/summary.json"))
+          assert d["overall"] == "OK", d
+          assert d["exit_code"] == 0, d
+          assert d["ipv4"]["status"] == "OK", d
+          print("summary.json OK:", d["ipv4"], d["ipv6"])
+          EOF
+
+      - name: Smoke test with stock bash 3.2 (macOS)
+        if: runner.os == 'macOS'
+        env:
+          SLA_TARGETS_V4: "127.0.0.1"
+          SLA_TARGETS_V6: "::1"
+          SLA_PROGRESS: "0"
+          SLA_OUTDIR: "smoke_out_bash32"
+        run: |
+          /bin/bash --version | head -n1
+          /bin/bash ./SLA.sh 5 100 50
+          grep -q '"overall": "OK"' smoke_out_bash32/summary.json
+
+      - name: Exit code checks
+        run: |
+          set +e
+          bash ./SLA.sh; rc=$?; set -e; test "$rc" -eq 64
+          set +e
+          SLA_TARGETS_V4="-c" SLA_OUTDIR=ec_out bash ./SLA.sh 2 100 0; rc=$?; set -e; test "$rc" -eq 64
+          echo "exit code checks OK"
