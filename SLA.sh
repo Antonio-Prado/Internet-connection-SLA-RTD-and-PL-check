@@ -43,6 +43,19 @@ sanitize_filename() {
   echo "$1" | tr ':/' '__'
 }
 
+json_escape() {
+  # Escape a string for use inside a JSON double-quoted value:
+  # backslash, double quote, newline, CR, tab; drop other control chars.
+  local s
+  s="$(printf '%s' "$1" | tr -d '\000-\010\013\014\016-\037')"
+  s=${s//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\n'/\\n}
+  s=${s//$'\r'/\\r}
+  s=${s//$'\t'/\\t}
+  printf '%s' "$s"
+}
+
 progress_bar() {
   # progress_bar <pid> <est_seconds> <label>
   local pid="$1"
@@ -338,9 +351,9 @@ v4_rtt_json="null"; v6_rtt_json="null"
 [ -n "${V4_AVG_RTT:-}" ] && v4_rtt_json="$V4_AVG_RTT"
 [ -n "${V6_AVG_RTT:-}" ] && v6_rtt_json="$V6_AVG_RTT"
 
-# Escape double quotes for JSON string values.
-run_id_json=${RUN_ID//\"/\\\"}
-outdir_json=${OUTDIR//\"/\\\"}
+# Escape string values for JSON.
+run_id_json="$(json_escape "$RUN_ID")"
+outdir_json="$(json_escape "$OUTDIR")"
 
 cat >"$OUTDIR/summary.json" <<JSON
 {
